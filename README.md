@@ -31,14 +31,23 @@ Linuxról keresztfordítva:
 
 ```sh
 # Windows (64 bit)
-GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli.exe ./cmd/suli
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -H windowsgui" -o suli.exe ./cmd/suli
 
 # macOS, Apple Silicon (M1/M2/...)
 GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-mac-arm64 ./cmd/suli
 
 # macOS, Intel
 GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-mac-amd64 ./cmd/suli
+
+# Raspberry Pi, 64 bites Raspberry Pi OS
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-pi-arm64 ./cmd/suli
+
+# Raspberry Pi, 32 bites Raspberry Pi OS (minden Pi-n fut, a Zero/1-en is)
+GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-pi-armv6 ./cmd/suli
 ```
+
+A Raspberry Pi-n asztali környezet (X11 vagy Wayland) és működő OpenGL-driver
+kell; a friss Raspberry Pi OS-en ez alapból megvan.
 
 A macOS-bináris nincs aláírva, ezért első indításkor a Gatekeeper blokkolhatja.
 Ilyenkor a Macen: `xattr -d com.apple.quarantine suli-mac-arm64 && chmod +x suli-mac-arm64`.
