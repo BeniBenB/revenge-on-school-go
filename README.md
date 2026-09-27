@@ -2,7 +2,8 @@
 
 A **Revenge on School** (Tomcat Software, 1994–95) DOS-os kalandjáték natív
 újraírása Go-ban. Egyetlen futtatható fájl, minden adat bele van ágyazva.
-Linuxon, Windowson és macOS-en fut, DOSBox és emulátor nélkül.
+Linuxon (PC-n és ARM-on, pl. Raspberry Pi-n), Windowson és macOS-en fut,
+DOSBox és emulátor nélkül.
 
 A port a Tomcat Software engedélyével készült, az eredeti `SULI.EXE`
 visszafejtésével, és ugyanazt a képet adja, mint az eredeti program.
@@ -38,16 +39,30 @@ GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o su
 
 # macOS, Intel
 GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-mac-amd64 ./cmd/suli
-
-# Raspberry Pi, 64 bites Raspberry Pi OS
-GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-pi-arm64 ./cmd/suli
-
-# Raspberry Pi, 32 bites Raspberry Pi OS (minden Pi-n fut, a Zero/1-en is)
-GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-pi-armv6 ./cmd/suli
 ```
 
-A Raspberry Pi-n asztali környezet (X11 vagy Wayland) és működő OpenGL-driver
-kell; a friss Raspberry Pi OS-en ez alapból megvan.
+### Linux ARM (pl. Raspberry Pi)
+
+ARM-os Linuxra is keresztfordítható, cgo nélkül, így nem kell hozzá ARM-os
+C-fordító vagy más eszközlánc, elég a Go:
+
+```sh
+# 64 bites ARM Linux (aarch64), pl. 64 bites Raspberry Pi OS
+GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-linux-arm64 ./cmd/suli
+
+# 32 bites ARM Linux, pl. 32 bites Raspberry Pi OS
+# GOARM=6: minden Pi-n fut (a Zero-n és az 1-esen is); GOARM=7 csak Pi 2-től felfelé
+GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o suli-linux-armv6 ./cmd/suli
+```
+
+Hogy melyik kell: a célgépen a `uname -m` parancs `aarch64`-et ír 64 bites
+rendszeren, `armv6l`/`armv7l`-t 32 bitesen. Magán a Pi-n is lefordítható, ha
+van rajta Go: `CGO_ENABLED=0 go build -o suli ./cmd/suli`.
+
+Futtatáshoz asztali környezet (X11 vagy Wayland) és működő OpenGL-driver kell;
+a friss Raspberry Pi OS-en ez alapból megvan.
+
+### Megjegyzések
 
 A macOS-bináris nincs aláírva, ezért első indításkor a Gatekeeper blokkolhatja.
 Ilyenkor a Macen: `xattr -d com.apple.quarantine suli-mac-arm64 && chmod +x suli-mac-arm64`.
